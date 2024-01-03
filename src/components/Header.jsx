@@ -22,7 +22,7 @@ export default function Header() {
             <div>
                 {!user && <NavLink to="/users/login" className="px-5">Login</NavLink>}
                 {!user && <NavLink to="/users/signup" className="px-5">Sign Up</NavLink>}
-                {user && <NavLink to={`/cocodogo-client/users/${userId}`} className="text-center py-2 md:py-4 px-5">{user.username}</NavLink>}
+                {user && <NavLink to={`/users/${userId}`} className="text-center py-2 md:py-4 px-5">{user.username}</NavLink>}
                 {user && <NavLink to="/" onClick={logoutService} className="text-center py-2 md:py-4 px-5">Logout</NavLink>}
             </div>
         </header>
