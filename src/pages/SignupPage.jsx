@@ -4,7 +4,7 @@ import DOMAIN from "../services/endpoint"
 import axios from "axios"
 import { useState } from "react"
 
-export default function SignupPage(){
+export default function SignupPage() {
 
     const navigate = useNavigate();
     const [message, setMessage] = useState("")
@@ -24,7 +24,7 @@ export default function SignupPage(){
         }
     }
 
-    return(
+    return (
         <div>
             <form onSubmit={handleSubmit} className="flex flex-col text-white">
                 <h2 className="py-10 text-2xl font-medium text-center">Sign Up</h2>
