@@ -2,6 +2,7 @@
 
 import { NavLink } from "react-router-dom";
 import useAuthStore from "../store/AuthStore";
+import { IoHomeSharp } from "react-icons/io5";
 
 export default function Header() {
 
@@ -10,9 +11,9 @@ export default function Header() {
 
     return (
         <header className="sticky z-50 top-0 py-5 md:flex justify-between bg-slate-900 text-white">
-            <div>
+            <div className="flex flex-col md:flex-row">
                 <NavLink to="/" className="px-5">CapyFinance</NavLink>
-                <NavLink to="/" className="px-5">Home</NavLink>
+                <NavLink to="/" className="flex px-5"><IoHomeSharp size={20} className=" text-center mx-2" /> Home</NavLink>
                 {user && <NavLink to={`/dashboard/${user.userId}`} className="px-5">Dashboard</NavLink>}
             </div>
             <div>

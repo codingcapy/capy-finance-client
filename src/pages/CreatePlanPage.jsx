@@ -34,8 +34,8 @@ export default function CreatePlanPage() {
                     <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <div className="flex flex-col my-2">
-                    <label htmlFor="content">Content</label>
-                    <textarea type="text" name='content' id='content' placeholder='Content' required rows="10" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                    <label htmlFor="content">Description</label>
+                    <textarea type="text" name='content' id='content' placeholder='Description' required rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <button type="submit" className="rounded-xl my-5 py-2 px-2 bg-slate-700 text-white">Create</button>
             </form>
