@@ -8,7 +8,7 @@ export default function DashboardPage() {
 
     const data = useLoaderData()
     const { user } = useAuthStore((state) => state)
-    console.log(data)
+    
     return (
         <div className="py-5">
             <h1 className="text-3xl font-bold text-center py-5 ">Welcome, {user.username}!</h1>
