@@ -23,6 +23,7 @@ import { useState } from "react";
 import Fixed from "../components/Fixed";
 import Variable from "../components/Variable";
 import Asset from "../components/Asset";
+import Liability from "../components/Liability";
 
 ChartJS.register(
     CategoryScale,
@@ -55,6 +56,8 @@ export default function PlanPage() {
     const [assetMessage, setAssetMessage] = useState("")
     const [liabilityMessage, setLiabilityMessage] = useState("")
     const netIncomes = []
+    const totalExpenditure = data.fixed.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) + data.variable.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
+    const totalAssets = data.assets.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
     data.income.forEach((value) => {
         const netIncome = (value.value - value.value * value.taxRate / 100) / 12;
         netIncomes.push(netIncome)
@@ -80,7 +83,7 @@ export default function PlanPage() {
             {
                 fill: true,
                 label: 'Net savings 2023',
-                data: labels.map(() => netMonthlyBalance += totalNetIncomes),
+                data: labels.map(() => netMonthlyBalance += (totalNetIncomes - totalExpenditure)),
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
@@ -183,21 +186,16 @@ export default function PlanPage() {
         const content = e.target.content.value
         const value = e.target.value.value
         if (isNaN(value)) {
-            setAssetMessage("Value must be a numeric value");
-            return;
-        }
-        const growthRate = e.target.growthrate.value
-        if (isNaN(growthRate)) {
-            setAssetMessage("Growth Rate must be a numeric value");
+            setLiabilityMessage("Value must be a numeric value");
             return;
         }
         const startDate = e.target.startdate.value
         const endDate = e.target.enddate.value
         const planId = data.plan.planId
-        const newAsset = { title, content, value, growthRate, startDate, endDate, planId }
-        const res = await axios.post(`${DOMAIN}/api/v1/liabilities`, newAsset)
+        const newLiability = { title, content, value, startDate, endDate, planId }
+        const res = await axios.post(`${DOMAIN}/api/v1/liabilities`, newLiability)
         if (res?.data.success) {
-            setSubmitAssetMode(false)
+            setSubmitLiabilityMode(false)
             navigate(`/plans/${data.plan.planId}`)
         }
     }
@@ -208,8 +206,8 @@ export default function PlanPage() {
             <p>{data.plan.content}</p>
             <Line options={options} data={chartData} />
             <div className="flex">
-                <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${totalNetIncomes.toLocaleString()}</p>
-                <p className="text-xl font-bold text-center px-5 py-5">Net Worth: ${totalNetIncomes.toLocaleString()}</p>
+                <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${(totalNetIncomes - totalExpenditure).toLocaleString()}</p>
+                <p className="text-xl font-bold text-center px-5 py-5">Net Worth: ${(totalNetIncomes + totalAssets).toLocaleString()}</p>
             </div>
             <div className="md:grid md:gap-4 md:grid-cols-3">
                 <div>
@@ -352,7 +350,7 @@ export default function PlanPage() {
                     <div className="flex text-xl font-bold text-center py-5 " onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedLiabilities && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitLiabilityMode(true)}>Add Liability</button>}
                     {submitLiabilityMode ?
-                        <form className="flex flex-col">
+                        <form onSubmit={submitLiability} className="flex flex-col">
                             <div className="flex flex-col">
                                 <label htmlFor="title" >Title</label>
                                 <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
@@ -378,6 +376,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitLiabilityMode(false)}>Cancel</button>
                         </form>
                         : ""}
+                    {expandedLiabilities && data.liabilities.map((element) => <Liability key={element.liabilityId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
             </div>
 
