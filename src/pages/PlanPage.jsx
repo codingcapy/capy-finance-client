@@ -53,6 +53,7 @@ export default function PlanPage() {
     const [fixedMessage, setFixedMessage] = useState("")
     const [variableMessage, setVariableMessage] = useState("")
     const [assetMessage, setAssetMessage] = useState("")
+    const [liabilityMessage, setLiabilityMessage] = useState("")
     const netIncomes = []
     data.income.forEach((value) => {
         const netIncome = (value.value - value.value * value.taxRate / 100) / 12;
@@ -170,6 +171,31 @@ export default function PlanPage() {
         const planId = data.plan.planId
         const newAsset = { title, content, value, growthRate, startDate, endDate, planId }
         const res = await axios.post(`${DOMAIN}/api/v1/assets`, newAsset)
+        if (res?.data.success) {
+            setSubmitAssetMode(false)
+            navigate(`/plans/${data.plan.planId}`)
+        }
+    }
+
+    async function submitLiability(e) {
+        e.preventDefault()
+        const title = e.target.title.value
+        const content = e.target.content.value
+        const value = e.target.value.value
+        if (isNaN(value)) {
+            setAssetMessage("Value must be a numeric value");
+            return;
+        }
+        const growthRate = e.target.growthrate.value
+        if (isNaN(growthRate)) {
+            setAssetMessage("Growth Rate must be a numeric value");
+            return;
+        }
+        const startDate = e.target.startdate.value
+        const endDate = e.target.enddate.value
+        const planId = data.plan.planId
+        const newAsset = { title, content, value, growthRate, startDate, endDate, planId }
+        const res = await axios.post(`${DOMAIN}/api/v1/liabilities`, newAsset)
         if (res?.data.success) {
             setSubmitAssetMode(false)
             navigate(`/plans/${data.plan.planId}`)
@@ -339,6 +365,15 @@ export default function PlanPage() {
                                 <label htmlFor="value">Value</label>
                                 <input type="text" name='value' id='value' placeholder='Value' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="startdate">Start Date</label>
+                                <input type="date" name='startdate' id='startdate' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="enddate">End Date</label>
+                                <input type="date" name='enddate' id='enddate' className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            {liabilityMessage}
                             <button type="submit" className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white">Add</button>
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitLiabilityMode(false)}>Cancel</button>
                         </form>
