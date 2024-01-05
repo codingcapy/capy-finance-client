@@ -21,6 +21,8 @@ import { FaChevronUp } from "react-icons/fa";
 import Income from "../components/Income";
 import { useState } from "react";
 import Fixed from "../components/Fixed";
+import Variable from "../components/Variable";
+import Asset from "../components/Asset";
 
 ChartJS.register(
     CategoryScale,
@@ -49,9 +51,11 @@ export default function PlanPage() {
     const [submitLiabilityMode, setSubmitLiabilityMode] = useState(false)
     const [incomeMessage, setIncomeMessage] = useState("")
     const [fixedMessage, setFixedMessage] = useState("")
+    const [variableMessage, setVariableMessage] = useState("")
+    const [assetMessage, setAssetMessage] = useState("")
     const netIncomes = []
     data.income.forEach((value) => {
-        const netIncome = (value.value - value.value * value.taxRate/100)/12;
+        const netIncome = (value.value - value.value * value.taxRate / 100) / 12;
         netIncomes.push(netIncome)
     })
     const totalNetIncomes = netIncomes.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
@@ -127,6 +131,51 @@ export default function PlanPage() {
         }
     }
 
+    async function submitVariable(e) {
+        e.preventDefault()
+        const title = e.target.title.value
+        const content = e.target.content.value
+        const value = e.target.value.value
+        if (isNaN(value)) {
+            setVariableMessage("Value must be a numeric value");
+            return;
+        }
+        const startDate = e.target.startdate.value
+        const endDate = e.target.enddate.value
+        const planId = data.plan.planId
+        const newVariable = { title, content, value, startDate, endDate, planId }
+        const res = await axios.post(`${DOMAIN}/api/v1/variable`, newVariable)
+        if (res?.data.success) {
+            setSubmitVariableMode(false)
+            navigate(`/plans/${data.plan.planId}`)
+        }
+    }
+
+    async function submitAsset(e) {
+        e.preventDefault()
+        const title = e.target.title.value
+        const content = e.target.content.value
+        const value = e.target.value.value
+        if (isNaN(value)) {
+            setAssetMessage("Value must be a numeric value");
+            return;
+        }
+        const growthRate = e.target.growthrate.value
+        if (isNaN(growthRate)) {
+            setAssetMessage("Growth Rate must be a numeric value");
+            return;
+        }
+        const startDate = e.target.startdate.value
+        const endDate = e.target.enddate.value
+        const planId = data.plan.planId
+        const newAsset = { title, content, value, growthRate, startDate, endDate, planId }
+        const res = await axios.post(`${DOMAIN}/api/v1/assets`, newAsset)
+        if (res?.data.success) {
+            setSubmitAssetMode(false)
+            navigate(`/plans/${data.plan.planId}`)
+        }
+    }
+
     return (
         <div>
             <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
@@ -171,7 +220,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitIncomeMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedIncome && data.income.map((element) => <Income key={element.incomeId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate}/>)}
+                    {expandedIncome && data.income.map((element) => <Income key={element.incomeId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedFixed(!expandedFixed)}>Fixed Expenditure {expandedFixed ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
@@ -203,13 +252,13 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitFixedMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                        {expandedFixed && <div>{data.fixed.map((element)=><Fixed title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate}/>)}</div>}
+                    {expandedFixed && <div>{data.fixed.map((element) => <Fixed key={element.fExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}</div>}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedVariable(!expandedVariable)}>Variable Expenditure {expandedVariable ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedVariable && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitVariableMode(true)}>Add Variable Spending</button>}
                     {submitVariableMode ?
-                        <form className="flex flex-col">
+                        <form onSubmit={submitVariable} className="flex flex-col">
                             <div className="flex flex-col">
                                 <label htmlFor="title" >Title</label>
                                 <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
@@ -219,19 +268,29 @@ export default function PlanPage() {
                                 <textarea type="text" name='content' id='content' placeholder='Content' required rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
                             <div className="flex flex-col my-1">
-                                <label htmlFor="value">Value</label>
+                                <label htmlFor="value">Monthly Value</label>
                                 <input type="text" name='value' id='value' placeholder='Value' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="startdate">Start Date</label>
+                                <input type="date" name='startdate' id='startdate' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="enddate">End Date</label>
+                                <input type="date" name='enddate' id='enddate' className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            {variableMessage}
                             <button type="submit" className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white">Add</button>
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitVariableMode(false)}>Cancel</button>
                         </form>
                         : ""}
+                    {expandedVariable && data.variable.map((element) => <Variable key={element.vExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center py-5 " onClick={() => setExpandedAssets(!expandedAssets)}>Assets {expandedAssets ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedAssets && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitAssetMode(true)}>Add Asset</button>}
                     {submitAssetMode ?
-                        <form className="flex flex-col">
+                        <form onSubmit={submitAsset} className="flex flex-col">
                             <div className="flex flex-col">
                                 <label htmlFor="title" >Title</label>
                                 <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
@@ -244,10 +303,24 @@ export default function PlanPage() {
                                 <label htmlFor="value">Value</label>
                                 <input type="text" name='value' id='value' placeholder='Value' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="startdate">Growth Rate</label>
+                                <input type="text" name='growthrate' id='growthrate' placeholder='%' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="startdate">Start Date</label>
+                                <input type="date" name='startdate' id='startdate' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="enddate">End Date</label>
+                                <input type="date" name='enddate' id='enddate' className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            {assetMessage}
                             <button type="submit" className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white">Add</button>
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitAssetMode(false)}>Cancel</button>
                         </form>
                         : ""}
+                    {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center py-5 " onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
