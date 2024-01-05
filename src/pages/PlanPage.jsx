@@ -58,12 +58,15 @@ export default function PlanPage() {
     const netIncomes = []
     const totalExpenditure = data.fixed.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) + data.variable.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
     const totalAssets = data.assets.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
+    const totalLiabilities = data.liabilities.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
+    let netWorth = totalAssets - totalLiabilities
     data.income.forEach((value) => {
         const netIncome = (value.value - value.value * value.taxRate / 100) / 12;
         netIncomes.push(netIncome)
     })
     const totalNetIncomes = netIncomes.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
-    let netMonthlyBalance = 0
+
+    const netMonthlyBalance = totalNetIncomes - totalExpenditure
     const options = {
         responsive: true,
         plugins: {
@@ -82,8 +85,8 @@ export default function PlanPage() {
         datasets: [
             {
                 fill: true,
-                label: 'Net savings 2023',
-                data: labels.map(() => netMonthlyBalance += (totalNetIncomes - totalExpenditure)),
+                label: 'Net Worth 2024',
+                data: labels.map(() => netWorth += netMonthlyBalance),
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
@@ -201,13 +204,13 @@ export default function PlanPage() {
     }
 
     return (
-        <div>
+        <div className="pb-10 px-1">
             <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
             <p>{data.plan.content}</p>
             <Line options={options} data={chartData} />
             <div className="flex">
-                <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${(totalNetIncomes - totalExpenditure).toLocaleString()}</p>
-                <p className="text-xl font-bold text-center px-5 py-5">Net Worth: ${(totalNetIncomes + totalAssets).toLocaleString()}</p>
+                <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${netMonthlyBalance.toLocaleString()}</p>
+                <p className="text-xl font-bold text-center px-5 py-5">Net Worth: ${(netWorth).toLocaleString()}</p>
             </div>
             <div className="md:grid md:gap-4 md:grid-cols-3">
                 <div>
@@ -311,7 +314,7 @@ export default function PlanPage() {
                     {expandedVariable && data.variable.map((element) => <Variable key={element.vExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center py-5 " onClick={() => setExpandedAssets(!expandedAssets)}>Assets {expandedAssets ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedAssets(!expandedAssets)}>Assets {expandedAssets ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedAssets && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitAssetMode(true)}>Add Asset</button>}
                     {submitAssetMode ?
                         <form onSubmit={submitAsset} className="flex flex-col">
@@ -347,7 +350,7 @@ export default function PlanPage() {
                     {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center py-5 " onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedLiabilities && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitLiabilityMode(true)}>Add Liability</button>}
                     {submitLiabilityMode ?
                         <form onSubmit={submitLiability} className="flex flex-col">
