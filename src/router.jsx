@@ -14,7 +14,7 @@ export default function Router() {
     const router = createBrowserRouter(
         createRoutesFromElements(
             <Route element={<Layout />}>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/capy-finance-client" element={<HomePage />} />
                 <Route path="/dashboard/:userId" element={<DashboardPage />} loader={pageLoader} />
                 <Route path="/plans/create" element={<CreatePlanPage />} />
                 <Route path="/plans/:planId" element={<PlanPage />} loader={planLoader} />
