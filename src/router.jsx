@@ -15,12 +15,12 @@ export default function Router() {
         createRoutesFromElements(
             <Route element={<Layout />}>
                 <Route path="/capy-finance-client/" element={<HomePage />} />
-                <Route path="/dashboard/:userId" element={<DashboardPage />} loader={pageLoader} />
-                <Route path="/plans/create" element={<CreatePlanPage />} />
-                <Route path="/plans/:planId" element={<PlanPage />} loader={planLoader} />
-                <Route path="/users/login" element={<LoginPage />} />
-                <Route path="/users/signup" element={<SignupPage />} />
-                <Route path="/users/:userId" element={<ProfilePage />} />
+                <Route path="/capy-finance-client/dashboard/:userId" element={<DashboardPage />} loader={pageLoader} />
+                <Route path="/capy-finance-client/plans/create" element={<CreatePlanPage />} />
+                <Route path="/capy-finance-client/plans/:planId" element={<PlanPage />} loader={planLoader} />
+                <Route path="/capy-finance-client/users/login" element={<LoginPage />} />
+                <Route path="/capy-finance-client/users/signup" element={<SignupPage />} />
+                <Route path="/capy-finance-client/users/:userId" element={<ProfilePage />} />
             </Route>
         )
     )
