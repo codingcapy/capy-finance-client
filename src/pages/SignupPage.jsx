@@ -17,7 +17,7 @@ export default function SignupPage() {
         const res = await axios.post(`${DOMAIN}/api/v1/users/`, newUser)
         if (res?.data.success) {
             setMessage(res?.data.message)
-            navigate("/users/login")
+            navigate("/capy-finance-client/users/login")
         }
         else {
             setMessage(res?.data.message)
@@ -37,7 +37,7 @@ export default function SignupPage() {
                     <input type="password" name="password" id="password" placeholder="Password" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white">Sign Up</button>
-                <NavLink to="/users/login" className="text-center">Login</NavLink>
+                <NavLink to="/capy-finance-client/users/login" className="text-center">Login</NavLink>
             </form>
         </div>
     )

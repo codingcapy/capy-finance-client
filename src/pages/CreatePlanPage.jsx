@@ -21,7 +21,7 @@ export default function CreatePlanPage() {
         const newPlan = { title, content, username, userId }
         const res = await axios.post(`${DOMAIN}/api/v1/plans`, newPlan)
         if (res?.data.success) {
-            navigate("/dashboard")
+            navigate(`/capy-finance-client/dashboard/${user.userId}`)
         }
     }
 
@@ -35,7 +35,7 @@ export default function CreatePlanPage() {
                 </div>
                 <div className="flex flex-col my-2">
                     <label htmlFor="content">Description</label>
-                    <textarea type="text" name='content' id='content' placeholder='Description' required rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                    <textarea type="text" name='content' id='content' placeholder='Description' rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <button type="submit" className="rounded-xl my-5 py-2 px-2 bg-slate-700 text-white">Create</button>
             </form>

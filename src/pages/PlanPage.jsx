@@ -65,8 +65,13 @@ export default function PlanPage() {
         netIncomes.push(netIncome)
     })
     const totalNetIncomes = netIncomes.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
-
     const netMonthlyBalance = totalNetIncomes - totalExpenditure
+    const monthlyGrowths = []
+    data.assets.forEach((asset) => {
+        const monthlyGrowth = (asset.value * asset.growthRate / 100 / 12)
+        monthlyGrowths.push(monthlyGrowth)
+    })
+    const totalGrowths = monthlyGrowths.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
     const options = {
         responsive: true,
         plugins: {
@@ -86,7 +91,7 @@ export default function PlanPage() {
             {
                 fill: true,
                 label: 'Net Worth 2024',
-                data: labels.map(() => netWorth += netMonthlyBalance),
+                data: labels.map(() => netWorth += (netMonthlyBalance + totalGrowths)),
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
@@ -114,7 +119,7 @@ export default function PlanPage() {
         const res = await axios.post(`${DOMAIN}/api/v1/incomes`, newIncome)
         if (res?.data.success) {
             setSubmitIncomeMode(false)
-            navigate(`/plans/${data.plan.planId}`)
+            navigate(`/capy-finance-client/plans/${data.plan.planId}`)
         }
     }
 
@@ -134,7 +139,7 @@ export default function PlanPage() {
         const res = await axios.post(`${DOMAIN}/api/v1/fixed`, newFixed)
         if (res?.data.success) {
             setSubmitFixedMode(false)
-            navigate(`/plans/${data.plan.planId}`)
+            navigate(`/capy-finance-client/plans/${data.plan.planId}`)
         }
     }
 
@@ -154,7 +159,7 @@ export default function PlanPage() {
         const res = await axios.post(`${DOMAIN}/api/v1/variable`, newVariable)
         if (res?.data.success) {
             setSubmitVariableMode(false)
-            navigate(`/plans/${data.plan.planId}`)
+            navigate(`/capy-finance-client/plans/${data.plan.planId}`)
         }
     }
 
@@ -179,7 +184,7 @@ export default function PlanPage() {
         const res = await axios.post(`${DOMAIN}/api/v1/assets`, newAsset)
         if (res?.data.success) {
             setSubmitAssetMode(false)
-            navigate(`/plans/${data.plan.planId}`)
+            navigate(`/capy-finance-client/plans/${data.plan.planId}`)
         }
     }
 
@@ -199,7 +204,7 @@ export default function PlanPage() {
         const res = await axios.post(`${DOMAIN}/api/v1/liabilities`, newLiability)
         if (res?.data.success) {
             setSubmitLiabilityMode(false)
-            navigate(`/plans/${data.plan.planId}`)
+            navigate(`/capy-finance-client/plans/${data.plan.planId}`)
         }
     }
 
@@ -208,8 +213,9 @@ export default function PlanPage() {
             <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
             <p>{data.plan.content}</p>
             <Line options={options} data={chartData} />
-            <div className="flex">
+            <div className="md:flex">
                 <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${netMonthlyBalance.toLocaleString()}</p>
+                <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Growth: ${(netMonthlyBalance + totalGrowths).toLocaleString()}</p>
                 <p className="text-xl font-bold text-center px-5 py-5">Net Worth: ${(netWorth).toLocaleString()}</p>
             </div>
             <div className="md:grid md:gap-4 md:grid-cols-3">
@@ -219,7 +225,7 @@ export default function PlanPage() {
                     {submitIncomeMode ?
                         <form onSubmit={submitIncome} className="flex flex-col">
                             <div className="flex flex-col">
-                                <label htmlFor="title" >Company Name</label>
+                                <label htmlFor="title" >Company Name</label> {/*not mandatory*/}
                                 <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
                             <div className="flex flex-col mt-1">
@@ -247,7 +253,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitIncomeMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedIncome && data.income.map((element) => <Income key={element.incomeId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
+                    {expandedIncome && data.income.map((element) => <Income key={element.incomeId} title={element.title} content={element.content} value={element.value} taxRate={element.taxRate} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedFixed(!expandedFixed)}>Fixed Expenditure {expandedFixed ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
@@ -347,7 +353,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitAssetMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
+                    {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} title={element.title} content={element.content} value={element.value} growthRate={element.growthRate} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>

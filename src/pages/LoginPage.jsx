@@ -11,7 +11,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (!!user) {
-            navigate(`/dashboard/${user.userId}`)
+            navigate(`/capy-finance-client/dashboard/${user.userId}`)
         }
     }, [user])
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
                     <input type="password" name="password" id="password" placeholder="Password" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white">Login</button>
-                <NavLink to="/users/signup" className="text-center">Sign Up</NavLink>
+                <NavLink to="/capy-finance-client/users/signup" className="text-center">Sign Up</NavLink>
             </form>
         </div>
     )

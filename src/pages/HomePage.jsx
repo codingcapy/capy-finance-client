@@ -69,13 +69,13 @@ export default function HomePage() {
             {!user && <p className="text-center py-5">Please sign up or log in to use this app!</p>}
             {!user && <div className="flex flex-col items-center">
                 <div className="border rounded-xl py-5 px-5 my-5 bg-slate-500">
-                    <NavLink to="/users/login">Login</NavLink>
+                    <NavLink to="/capy-finance-client/users/login">Login</NavLink>
                 </div>
-                <NavLink to="/users/signup" className="underline">Sign Up</NavLink>
+                <NavLink to="/capy-finance-client/users/signup" className="underline">Sign Up</NavLink>
             </div>}
             {user && <div className="flex flex-col items-center">
                 <div className="border rounded-xl py-5 px-5 my-5 bg-slate-500">
-                    <NavLink to={`/dashboard/${user.userId}`}>Go to Dashboard</NavLink>
+                    <NavLink to={`/capy-finance-client/dashboard/${user.userId}`}>Go to Dashboard</NavLink>
                 </div>
             </div>}
         </div>
