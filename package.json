@@ -1,6 +1,6 @@
 {
   "name": "capy-finance-client",
-  "private": false,
+  "private": true,
   "version": "0.0.0",
   "homepage": "https://codingcapy.github.io/capy-finance-client/",
   "type": "module",
