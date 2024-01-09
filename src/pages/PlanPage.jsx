@@ -5,7 +5,6 @@ import { useLoaderData, useNavigate } from "react-router-dom"
 import { useState } from "react";
 import axios from "axios"
 import DOMAIN from "../services/endpoint"
-import useAuthStore from "../store/AuthStore";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -41,8 +40,9 @@ export default function PlanPage() {
 
     const data = useLoaderData()
     const navigate = useNavigate()
-    const { user } = useAuthStore((state) => state)
     const [editMode, setEditMode] = useState(false)
+    const [editedTitle, setEditedTitle] = useState(data.plan.title);
+    const [editedContent, setEditedContent] = useState(data.plan.content);
     const [expandedMenu, setExpandedMenu] = useState(false)
     const [expandedIncome, setExpandedIncome] = useState(false)
     const [submitIncomeMode, setSubmitIncomeMode] = useState(false)
@@ -98,22 +98,45 @@ export default function PlanPage() {
     const liabilitiesDates = []
     const goalDates = []
     const dates = []
-    data.income.forEach((element) => incomeDates.push(new Date(element.startDate)))
-    const minIncomeDate = new Date(Math.min(...incomeDates))
-    data.fixed.forEach((element) => fixedDates.push(new Date(element.startDate)))
-    const minFixedDate = new Date(Math.min(...fixedDates))
-    data.variable.forEach((element) => variableDates.push(new Date(element.startDate)))
-    const minVariableDate = new Date(Math.min(...variableDates))
-    data.assets.forEach((element) => assetDates.push(new Date(element.startDate)))
-    const minAssetDate = new Date(Math.min(...assetDates))
-    data.liabilities.forEach((element) => liabilitiesDates.push(new Date(element.startDate)))
-    const minLiabilityDate = new Date(Math.min(...liabilitiesDates))
-    data.goals.forEach((element) => goalDates.push(new Date(element.startDate)))
-    const minGoalDate = new Date(Math.min(...goalDates))
+    let minIncomeDate = new Date()
+    let minFixedDate = new Date()
+    let minVariableDate = new Date()
+    let minAssetDate = new Date()
+    let minLiabilityDate = new Date()
+    let minGoalDate = new Date()
+    if (data.income.length > 0) {
+        data.income.forEach((element) => incomeDates.push(new Date(element.startDate)))
+        minIncomeDate = new Date(Math.min(...incomeDates))
+    }
+    if (data.fixed.length > 0) {
+        data.fixed.forEach((element) => fixedDates.push(new Date(element.startDate)))
+        minFixedDate = new Date(Math.min(...fixedDates))
+    }
+    if (data.variable.length > 0) {
+        data.variable.forEach((element) => variableDates.push(new Date(element.startDate)))
+        minVariableDate = new Date(Math.min(...variableDates))
+    }
+    if (data.assets.length > 0) {
+        data.assets.forEach((element) => assetDates.push(new Date(element.startDate)))
+        minAssetDate = new Date(Math.min(...assetDates))
+    }
+    if (data.liabilities.length > 0) {
+        data.liabilities.forEach((element) => liabilitiesDates.push(new Date(element.startDate)))
+        minLiabilityDate = new Date(Math.min(...liabilitiesDates))
+    }
+    if (data.goals.length > 0) {
+        data.goals.forEach((element) => goalDates.push(new Date(element.startDate)))
+        const minGoalDate = new Date(Math.min(...goalDates))
+    }
     dates.push(minIncomeDate, minFixedDate, minVariableDate, minAssetDate, minLiabilityDate, minGoalDate)
     dates.sort((a, b) => { return a + b })
-    const oldestDate = dates[0]
-    oldestDate.setDate(1)
+    let oldestDate
+    if (dates.length > 0) {
+        oldestDate = dates[0]
+    }
+    else {
+        oldestDate = new Date()
+    }
     const minDate = oldestDate.toISOString().split('T')[0]
     const currentDate = new Date()
     currentDate.setFullYear(currentDate.getFullYear() + 1)
@@ -145,7 +168,30 @@ export default function PlanPage() {
         const updatedPlan = { title, content }
         const res = await axios.post(`${DOMAIN}/api/v1/plans/${planId}`, updatedPlan);
         if (res?.data.success) {
-            navigate(`/capy-finance-client/dashboard/${user.userId}`)
+            navigate(`/capy-finance-client/plans/${planId}`)
+            setEditMode(false)
+        }
+    }
+
+    async function archivePlan() {
+        const active = false;
+        const planId = data.plan.planId;
+        const updatedPlan = { active }
+        const res = await axios.post(`${DOMAIN}/api/v1/plans/${planId}`, updatedPlan);
+        if (res?.data.success) {
+            navigate(`/capy-finance-client/plans/${planId}`)
+            setExpandedMenu(false)
+        }
+    }
+
+    async function unarchivePlan() {
+        const active = true;
+        const planId = data.plan.planId;
+        const updatedPlan = { active }
+        const res = await axios.post(`${DOMAIN}/api/v1/plans/${planId}`, updatedPlan);
+        if (res?.data.success) {
+            navigate(`/capy-finance-client/plans/${planId}`)
+            setExpandedMenu(false)
         }
     }
 
@@ -288,17 +334,18 @@ export default function PlanPage() {
                 </div>}
                 {expandedMenu && <div className="absolute right-0 top-full">
                     <div onClick={() => { setEditMode(true); setExpandedMenu(false) }} className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white cursor-pointer">Edit Plan</div>
-                    <div className="rounded-xl my-1 py-2 px-2 bg-red-700 text-white cursor-pointer">Archive Plan</div>
+                    {data.plan.active && <div className="rounded-xl my-1 py-2 px-2 bg-red-700 text-white cursor-pointer" onClick={archivePlan}>Archive Plan</div>}
+                    {!data.plan.active && <div className="rounded-xl my-1 py-2 px-2 bg-green-700 text-white cursor-pointer" onClick={unarchivePlan}>Unarchive Plan</div>}
                 </div>}
             </div>
-            {editMode && <form className="flex flex-col">
+            {editMode && <form onSubmit={submitPlan} className="flex flex-col">
                 <div className="flex flex-col">
                     <label htmlFor="title" >Title</label>
-                    <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                    <input type="text" name='title' id='title' placeholder="Title" required value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <div className="flex flex-col my-2">
                     <label htmlFor="content">Description</label>
-                    <textarea type="text" name='content' id='content' placeholder='Description' rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                    <textarea type="text" name='content' id='content' placeholder='Description' rows="2" cols="40" value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <button type="submit" className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white">Edit</button>
                 <button onClick={() => setEditMode(false)} className="rounded-xl py-2 px-2 bg-red-700 text-white">Cancel</button>
@@ -345,7 +392,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitIncomeMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedIncome && data.income.map((element) => <Income key={element.incomeId} title={element.title} content={element.content} value={element.value} taxRate={element.taxRate} startDate={element.startDate} endDate={element.endDate} />)}
+                    {expandedIncome && data.income.map((element) => <Income key={element.incomeId} incomeId={element.incomeId} planId={element.planId} title={element.title} content={element.content} value={element.value} taxRate={element.taxRate} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedFixed(!expandedFixed)}>Fixed Expenditure {expandedFixed ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>

@@ -17,6 +17,7 @@ export default function DashboardPage() {
                 {data.map((plan) =>
                     <div key={plan.planId} className="border border-white rounded-xl px-3 py-3">
                         <NavLink to={`/capy-finance-client/plans/${plan.planId}`} className="flex flex-col text-center">
+                            {!plan.active && <div className="text-xl font-bold  text-gray-500">ARCHIVED</div>}
                             <h3 className="text-xl font-bold text-center py-5 ">{plan.title}</h3>
                             <p>{plan.content}</p>
                         </NavLink>

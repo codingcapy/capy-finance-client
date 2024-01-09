@@ -1,5 +1,8 @@
 
-
+import { useState } from "react"
+import axios from "axios";
+import DOMAIN from "../services/endpoint";
+import { useNavigate } from "react-router-dom";
 
 export default function Fixed(props) {
 
