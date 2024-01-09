@@ -497,7 +497,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitAssetMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} title={element.title} content={element.content} value={element.value} growthRate={element.growthRate} startDate={element.startDate} endDate={element.endDate} />)}
+                    {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} assetId={element.assetId} planId={element.planId} title={element.title} content={element.content} value={element.value} growthRate={element.growthRate} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
