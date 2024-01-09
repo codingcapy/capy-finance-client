@@ -5,7 +5,7 @@ export default function Asset(props) {
 
     return (
         <div>
-            <p className="text-xl font-boldpx-5">{props.title} <span className="text-base font-normal rounded-xl py-2 px-2 bg-slate-600">edit</span></p>
+            <p className="text-xl font-boldpx-5">{props.title} <span className="text-base font-normal rounded-xl py-2 px-2 bg-slate-600 cursor-pointer">edit</span></p>
             <p>{props.content}</p>
             <p className="font-bold">Value: ${Number(props.value).toFixed(2)}</p>
             <p>Growth Rate: {Number(props.growthRate).toFixed(2)}%</p>

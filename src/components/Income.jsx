@@ -33,7 +33,7 @@ export default function Income(props) {
 
     return (
         <div>
-            <p className="text-xl font-bold">{props.title} <span className="text-base font-normal rounded-xl py-2 px-2 bg-slate-600" onClick={() => setEditMode(true)}>edit</span></p>
+            <p className="text-xl font-bold">{props.title} <span className="text-base font-normal rounded-xl py-2 px-2 bg-slate-600 cursor-pointer" onClick={() => setEditMode(true)}>edit</span></p>
             {editMode && <form onSubmit={submitIncome} className="flex flex-col">
                 <div className="flex flex-col">
                     <label htmlFor="title" >Company Name</label> {/*not mandatory*/}

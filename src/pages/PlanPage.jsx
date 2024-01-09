@@ -5,6 +5,7 @@ import { useLoaderData, useNavigate } from "react-router-dom"
 import { useState } from "react";
 import axios from "axios"
 import DOMAIN from "../services/endpoint"
+import useAuthStore from "../store/AuthStore";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -40,6 +41,9 @@ export default function PlanPage() {
 
     const data = useLoaderData()
     const navigate = useNavigate()
+    const { user } = useAuthStore((state) => state)
+    const [editMode, setEditMode] = useState(false)
+    const [expandedMenu, setExpandedMenu] = useState(false)
     const [expandedIncome, setExpandedIncome] = useState(false)
     const [submitIncomeMode, setSubmitIncomeMode] = useState(false)
     const [expandedFixed, setExpandedFixed] = useState(false)
@@ -108,8 +112,11 @@ export default function PlanPage() {
     const minGoalDate = new Date(Math.min(...goalDates))
     dates.push(minIncomeDate, minFixedDate, minVariableDate, minAssetDate, minLiabilityDate, minGoalDate)
     dates.sort((a, b) => { return a + b })
-    const minDate = dates[0].toISOString().split('T')[0]
+    const oldestDate = dates[0]
+    oldestDate.setDate(1)
+    const minDate = oldestDate.toISOString().split('T')[0]
     const currentDate = new Date()
+    currentDate.setFullYear(currentDate.getFullYear() + 1)
     const labels = [];
     labels.push(minDate)
     while (labels[labels.length - 1] < currentDate.toISOString().split('T')[0]) {
@@ -129,6 +136,18 @@ export default function PlanPage() {
             },
         ],
     };
+
+    async function submitPlan(e) {
+        e.preventDefault()
+        const title = e.target.title.value;
+        const content = e.target.content.value;
+        const planId = data.plan.planId;
+        const updatedPlan = { title, content }
+        const res = await axios.post(`${DOMAIN}/api/v1/plans/${planId}`, updatedPlan);
+        if (res?.data.success) {
+            navigate(`/capy-finance-client/dashboard/${user.userId}`)
+        }
+    }
 
     async function submitIncome(e) {
         e.preventDefault()
@@ -261,13 +280,30 @@ export default function PlanPage() {
 
     return (
         <div className="pb-10 px-1">
-            <div className="flex justify-between">
-                <div></div>
-                <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
-                <FaCog size={25} className="mt-7" />
+            <div className="relative">
+                {!editMode && <div className="flex justify-between">
+                    <div className="text-2xl font-bold py-5 text-gray-500">{!data.plan.active && "ARCHIVED"}</div>
+                    <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
+                    <FaCog size={25} onClick={() => setExpandedMenu(!expandedMenu)} className="mt-7 cursor-pointer" />
+                </div>}
+                {expandedMenu && <div className="absolute right-0 top-full">
+                    <div onClick={() => { setEditMode(true); setExpandedMenu(false) }} className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white cursor-pointer">Edit Plan</div>
+                    <div className="rounded-xl my-1 py-2 px-2 bg-red-700 text-white cursor-pointer">Archive Plan</div>
+                </div>}
             </div>
-            <p>{data.plan.content}</p>
-
+            {editMode && <form className="flex flex-col">
+                <div className="flex flex-col">
+                    <label htmlFor="title" >Title</label>
+                    <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                </div>
+                <div className="flex flex-col my-2">
+                    <label htmlFor="content">Description</label>
+                    <textarea type="text" name='content' id='content' placeholder='Description' rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                </div>
+                <button type="submit" className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white">Edit</button>
+                <button onClick={() => setEditMode(false)} className="rounded-xl py-2 px-2 bg-red-700 text-white">Cancel</button>
+            </form>}
+            {!editMode && <p>{data.plan.content}</p>}
             <Line options={options} data={chartData} />
             <div className="md:flex">
                 <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${netMonthlyBalance.toLocaleString()}</p>
@@ -276,7 +312,7 @@ export default function PlanPage() {
             </div>
             <div className="md:grid md:gap-4 md:grid-cols-3">
                 <div>
-                    <div className="flex text-xl font-bold text-center pt-5" onClick={() => setExpandedIncome(!expandedIncome)}>Income {expandedIncome ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedIncome(!expandedIncome)}>Income {expandedIncome ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedIncome && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitIncomeMode(true)}>Add Income</button>}
                     {submitIncomeMode ?
                         <form onSubmit={submitIncome} className="flex flex-col">
@@ -312,7 +348,7 @@ export default function PlanPage() {
                     {expandedIncome && data.income.map((element) => <Income key={element.incomeId} title={element.title} content={element.content} value={element.value} taxRate={element.taxRate} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedFixed(!expandedFixed)}>Fixed Expenditure {expandedFixed ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedFixed(!expandedFixed)}>Fixed Expenditure {expandedFixed ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedFixed && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitFixedMode(true)}>Add Fixed Spending</button>}
                     {submitFixedMode ?
                         <form onSubmit={submitFixed} className="flex flex-col">
@@ -344,7 +380,7 @@ export default function PlanPage() {
                     {expandedFixed && <div>{data.fixed.map((element) => <Fixed key={element.fExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}</div>}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedVariable(!expandedVariable)}>Variable Expenditure {expandedVariable ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedVariable(!expandedVariable)}>Variable Expenditure {expandedVariable ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedVariable && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitVariableMode(true)}>Add Variable Spending</button>}
                     {submitVariableMode ?
                         <form onSubmit={submitVariable} className="flex flex-col">
@@ -376,7 +412,7 @@ export default function PlanPage() {
                     {expandedVariable && data.variable.map((element) => <Variable key={element.vExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedAssets(!expandedAssets)}>Assets {expandedAssets ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedAssets(!expandedAssets)}>Assets {expandedAssets ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedAssets && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitAssetMode(true)}>Add Asset</button>}
                     {submitAssetMode ?
                         <form onSubmit={submitAsset} className="flex flex-col">
@@ -412,7 +448,7 @@ export default function PlanPage() {
                     {expandedAssets && data.assets.map((element) => <Asset key={element.assetId} title={element.title} content={element.content} value={element.value} growthRate={element.growthRate} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedLiabilities(!expandedLiabilities)}>Liabilities {expandedLiabilities ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedLiabilities && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitLiabilityMode(true)}>Add Liability</button>}
                     {submitLiabilityMode ?
                         <form onSubmit={submitLiability} className="flex flex-col">
@@ -444,7 +480,7 @@ export default function PlanPage() {
                     {expandedLiabilities && data.liabilities.map((element) => <Liability key={element.liabilityId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
-                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedGoals(!expandedGoals)}>Financial Goals {expandedGoals ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedGoals(!expandedGoals)}>Financial Goals {expandedGoals ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
                     {expandedGoals && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitGoalMode(true)}>Add Financial Goal</button>}
                     {submitGoalMode ?
                         <form onSubmit={submitGoal} className="flex flex-col">

@@ -24,7 +24,7 @@ export default function ProfilePage() {
         const password = e.target.password.value;
         const userId = user.userId
         const updatedUser = { password };
-        const res = await axios.post(`${DOMAIN}/api/users/${userId}`, updatedUser);
+        const res = await axios.post(`${DOMAIN}/api/v1/users/${userId}`, updatedUser);
         toggleEditMode();
         setMessage("Password updated successfully!")
         if (res?.data.success) {
@@ -38,7 +38,7 @@ export default function ProfilePage() {
             <p>Username: {user.username}</p>
             {editMode
                 ? <form onSubmit={handleEditPassword} className="flex flex-col">
-                    <input type="password" id="password" name="password" placeholder="New Password" required className="px-2 border rounded-lg border-slate-700 py-1" />
+                    <input type="password" id="password" name="password" placeholder="New Password" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                     <button type="submit" className="rounded-xl my-5 py-2 px-2 bg-slate-700 text-white" >Change password</button>
                     <button className="" onClick={toggleEditMode}>Cancel</button>
                 </form>
