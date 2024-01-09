@@ -2,6 +2,7 @@
 
 
 import { useLoaderData, useNavigate } from "react-router-dom"
+import { useState } from "react";
 import axios from "axios"
 import DOMAIN from "../services/endpoint"
 import {
@@ -16,14 +17,13 @@ import {
     Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { FaChevronDown } from "react-icons/fa";
-import { FaChevronUp } from "react-icons/fa";
 import Income from "../components/Income";
-import { useState } from "react";
 import Fixed from "../components/Fixed";
 import Variable from "../components/Variable";
 import Asset from "../components/Asset";
 import Liability from "../components/Liability";
+import Goal from "../components/Goal";
+import { FaChevronDown, FaChevronUp, FaCog } from "react-icons/fa";
 
 ChartJS.register(
     CategoryScale,
@@ -50,11 +50,14 @@ export default function PlanPage() {
     const [submitAssetMode, setSubmitAssetMode] = useState(false)
     const [expandedLiabilities, setExpandedLiabilities] = useState(false)
     const [submitLiabilityMode, setSubmitLiabilityMode] = useState(false)
+    const [expandedGoals, setExpandedGoals] = useState(false)
+    const [submitGoalMode, setSubmitGoalMode] = useState(false)
     const [incomeMessage, setIncomeMessage] = useState("")
     const [fixedMessage, setFixedMessage] = useState("")
     const [variableMessage, setVariableMessage] = useState("")
     const [assetMessage, setAssetMessage] = useState("")
     const [liabilityMessage, setLiabilityMessage] = useState("")
+    const [goalMessage, setGoalMessage] = useState("")
     const netIncomes = []
     const totalExpenditure = data.fixed.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) + data.variable.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
     const totalAssets = data.assets.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
@@ -84,13 +87,42 @@ export default function PlanPage() {
             },
         },
     };
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+    const incomeDates = []
+    const fixedDates = []
+    const variableDates = []
+    const assetDates = []
+    const liabilitiesDates = []
+    const goalDates = []
+    const dates = []
+    data.income.forEach((element) => incomeDates.push(new Date(element.startDate)))
+    const minIncomeDate = new Date(Math.min(...incomeDates))
+    data.fixed.forEach((element) => fixedDates.push(new Date(element.startDate)))
+    const minFixedDate = new Date(Math.min(...fixedDates))
+    data.variable.forEach((element) => variableDates.push(new Date(element.startDate)))
+    const minVariableDate = new Date(Math.min(...variableDates))
+    data.assets.forEach((element) => assetDates.push(new Date(element.startDate)))
+    const minAssetDate = new Date(Math.min(...assetDates))
+    data.liabilities.forEach((element) => liabilitiesDates.push(new Date(element.startDate)))
+    const minLiabilityDate = new Date(Math.min(...liabilitiesDates))
+    data.goals.forEach((element) => goalDates.push(new Date(element.startDate)))
+    const minGoalDate = new Date(Math.min(...goalDates))
+    dates.push(minIncomeDate, minFixedDate, minVariableDate, minAssetDate, minLiabilityDate, minGoalDate)
+    dates.sort((a, b) => { return a + b })
+    const minDate = dates[0].toISOString().split('T')[0]
+    const currentDate = new Date()
+    const labels = [];
+    labels.push(minDate)
+    while (labels[labels.length - 1] < currentDate.toISOString().split('T')[0]) {
+        const lastLabel = new Date(labels[labels.length - 1]);
+        lastLabel.setUTCMonth(lastLabel.getUTCMonth() + 1);
+        labels.push(lastLabel.toISOString().split('T')[0]);
+    }
     const chartData = {
         labels,
         datasets: [
             {
                 fill: true,
-                label: 'Net Worth 2024',
+                label: `Net Worth ${new Date().getFullYear()}`,
                 data: labels.map(() => netWorth += (netMonthlyBalance + totalGrowths)),
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
@@ -208,10 +240,34 @@ export default function PlanPage() {
         }
     }
 
+    async function submitGoal(e) {
+        e.preventDefault()
+        const title = e.target.title.value
+        const content = e.target.content.value
+        const value = e.target.value.value
+        if (isNaN(value)) {
+            setGoalMessage("Value must be a numeric value");
+            return;
+        }
+        const startDate = e.target.startdate.value
+        const planId = data.plan.planId
+        const newGoal = { title, content, value, startDate, planId }
+        const res = await axios.post(`${DOMAIN}/api/v1/goals`, newGoal)
+        if (res?.data.success) {
+            setSubmitGoalMode(false)
+            navigate(`/capy-finance-client/plans/${data.plan.planId}`)
+        }
+    }
+
     return (
         <div className="pb-10 px-1">
-            <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
+            <div className="flex justify-between">
+                <div></div>
+                <h1 className="text-3xl font-bold text-center py-5 ">{data.plan.title}</h1>
+                <FaCog size={25} className="mt-7" />
+            </div>
             <p>{data.plan.content}</p>
+
             <Line options={options} data={chartData} />
             <div className="md:flex">
                 <p className="text-xl font-bold text-center px-5 py-5">Net Monthly Balance: ${netMonthlyBalance.toLocaleString()}</p>
@@ -386,6 +442,34 @@ export default function PlanPage() {
                         </form>
                         : ""}
                     {expandedLiabilities && data.liabilities.map((element) => <Liability key={element.liabilityId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
+                </div>
+                <div>
+                    <div className="flex text-xl font-bold text-center pt-5 " onClick={() => setExpandedGoals(!expandedGoals)}>Financial Goals {expandedGoals ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
+                    {expandedGoals && <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white" onClick={() => setSubmitGoalMode(true)}>Add Financial Goal</button>}
+                    {submitGoalMode ?
+                        <form onSubmit={submitGoal} className="flex flex-col">
+                            <div className="flex flex-col">
+                                <label htmlFor="title" >Title</label>
+                                <input type="text" name='title' id='title' placeholder="Title" required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="content">Description</label>
+                                <textarea type="text" name='content' id='content' placeholder='Content' required rows="2" cols="40" className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="value">Value</label>
+                                <input type="text" name='value' id='value' placeholder='Value' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            <div className="flex flex-col my-1">
+                                <label htmlFor="startdate">Start Date</label>
+                                <input type="date" name='startdate' id='startdate' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                            </div>
+                            {goalMessage}
+                            <button type="submit" className="rounded-xl my-1 py-2 px-2 bg-slate-700 text-white">Add</button>
+                            <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitGoalMode(false)}>Cancel</button>
+                        </form>
+                        : ""}
+                    {expandedGoals && data.goals.map((element) => <Goal key={element.goalId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} />)}
                 </div>
             </div>
 
