@@ -1,4 +1,10 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: layout jsx for capy finance client
+ */
 
 import { Outlet } from "react-router-dom"
 import Header from "./components/Header"

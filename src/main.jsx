@@ -1,4 +1,10 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: main jsx for capy finance client
+ */
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'

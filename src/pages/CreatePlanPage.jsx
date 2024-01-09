@@ -1,5 +1,10 @@
 
-
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: create plan page jsx for capy finance client
+ */
 
 import { useNavigate } from "react-router-dom"
 import useAuthStore from "../store/AuthStore"

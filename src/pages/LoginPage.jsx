@@ -1,4 +1,11 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: login page jsx for capy finance client
+ */
+
 import { useEffect, useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import useAuthStore from "../store/AuthStore"
@@ -41,6 +48,8 @@ export default function LoginPage() {
                 <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white">Login</button>
                 <NavLink to="/capy-finance-client/users/signup" className="text-center">Sign Up</NavLink>
             </form>
+            {authLoading ? <h2>Loading...</h2> : null}
+            <p>{message}</p>
         </div>
     )
 }

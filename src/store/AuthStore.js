@@ -1,4 +1,10 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: authstore for capy finance client
+ */
 
 import DOMAIN from "../services/endpoint";
 import axios from "axios";

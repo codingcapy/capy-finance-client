@@ -1,4 +1,11 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: signup page jsx for capy finance client
+ */
+
 import { NavLink, useNavigate } from "react-router-dom"
 import DOMAIN from "../services/endpoint"
 import axios from "axios"
@@ -39,6 +46,7 @@ export default function SignupPage() {
                 <button className="rounded-xl my-5 py-2 px-2 bg-slate-600 text-white">Sign Up</button>
                 <NavLink to="/capy-finance-client/users/login" className="text-center">Login</NavLink>
             </form>
+            <p>{message}</p>
         </div>
     )
 }

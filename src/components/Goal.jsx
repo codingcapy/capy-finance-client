@@ -1,4 +1,10 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: goal component jsx for capy finance client
+ */
 
 export default function Goal(props) {
 

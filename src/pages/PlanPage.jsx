@@ -1,5 +1,10 @@
 
-
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: plan page jsx for capy finance client
+ */
 
 import { useLoaderData, useNavigate } from "react-router-dom"
 import { useState } from "react";
@@ -424,7 +429,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitFixedMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedFixed && <div>{data.fixed.map((element) => <Fixed key={element.fExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}</div>}
+                    {expandedFixed && <div>{data.fixed.map((element) => <Fixed key={element.fExpId} fExpId={element.fExpId} planId={element.planId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}</div>}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedVariable(!expandedVariable)}>Variable Expenditure {expandedVariable ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>
@@ -456,7 +461,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitVariableMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedVariable && data.variable.map((element) => <Variable key={element.vExpId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
+                    {expandedVariable && data.variable.map((element) => <Variable key={element.vExpId} vExpId={element.vExpId} planId={element.planId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} endDate={element.endDate} />)}
                 </div>
                 <div>
                     <div className="flex text-xl font-bold text-center pt-5 cursor-pointer" onClick={() => setExpandedAssets(!expandedAssets)}>Assets {expandedAssets ? <FaChevronUp size={20} className=" text-center ml-5" /> : <FaChevronDown size={20} className=" text-center ml-5" />}</div>

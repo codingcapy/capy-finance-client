@@ -1,4 +1,10 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: jwt service for capy finance client
+ */
 
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";

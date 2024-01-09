@@ -1,5 +1,10 @@
 
-
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: profile page jsx for capy finance client
+ */
 
 import useAuthStore from "../store/AuthStore"
 import DOMAIN from "../services/endpoint"

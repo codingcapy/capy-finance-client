@@ -1,5 +1,10 @@
 
-
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: auth component jsx for capy finance client
+ */
 
 import { jwtDecode } from "jwt-decode";
 import { setSession, getAccessToken } from "../../services/jwt.service";

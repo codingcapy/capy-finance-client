@@ -1,4 +1,10 @@
 
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: router jsx for capy finance client
+ */
 
 import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
 import Layout from "./Layout";

@@ -1,5 +1,10 @@
 
-
+/*
+Author: Paul Kim
+Date: January 9, 2024
+Version: 1.0
+Description: income component jsx for capy finance client
+ */
 
 import { useState } from "react"
 import axios from "axios";
