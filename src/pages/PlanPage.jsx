@@ -557,7 +557,7 @@ export default function PlanPage() {
                             <button className="rounded-xl py-2 px-2 bg-red-900 text-white" onClick={() => setSubmitGoalMode(false)}>Cancel</button>
                         </form>
                         : ""}
-                    {expandedGoals && data.goals.map((element) => <Goal key={element.goalId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} />)}
+                    {expandedGoals && data.goals.map((element) => <Goal key={element.goalId} goalId={element.goalId} planId={element.planId} title={element.title} content={element.content} value={element.value} startDate={element.startDate} />)}
                 </div>
             </div>
 
