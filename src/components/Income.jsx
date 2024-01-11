@@ -66,8 +66,8 @@ export default function Income(props) {
                     <input type="text" name='value' id='value' placeholder='Salary' value={editedValue} onChange={(e) => setEditedValue(e.target.value)} required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <div className="flex flex-col my-1">
-                    <label htmlFor="taxrate">Tax Rate</label>
-                    <input type="text" name='taxrate' id='taxrate' placeholder='Tax Rate' value={editedTaxRate} onChange={(e) => setEditedTaxRate(e.target.value)} required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                    <label htmlFor="taxrate">Tax Rate %</label>
+                    <input type="text" name='taxrate' id='taxrate' placeholder='e.g 20.57' value={editedTaxRate} onChange={(e) => setEditedTaxRate(e.target.value)} required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                 </div>
                 <div className="flex flex-col my-1">
                     <label htmlFor="startdate">Start Date</label>

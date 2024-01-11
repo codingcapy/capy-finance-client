@@ -423,8 +423,8 @@ export default function PlanPage() {
                                 <input type="text" name='value' id='value' placeholder='Salary' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
                             <div className="flex flex-col my-1">
-                                <label htmlFor="taxrate">Tax Rate</label>
-                                <input type="text" name='taxrate' id='taxrate' placeholder='Tax Rate' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
+                                <label htmlFor="taxrate">Tax Rate %</label>
+                                <input type="text" name='taxrate' id='taxrate' placeholder='e.g. 20.57' required className="px-2 border rounded-lg border-slate-700 py-1 text-black" />
                             </div>
                             <div className="flex flex-col my-1">
                                 <label htmlFor="startdate">Start Date</label>
