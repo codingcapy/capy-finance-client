@@ -6,6 +6,6 @@ Version: 1.0
 Description: endpoint for capy finance client
  */
 
-const DOMAIN = "http://localhost:3333"
+const DOMAIN = "https://capyfinance-server.onrender.com"
 
 export default DOMAIN;
