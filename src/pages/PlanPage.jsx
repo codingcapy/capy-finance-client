@@ -158,7 +158,49 @@ export default function PlanPage() {
             {
                 fill: true,
                 label: `Net Worth ${new Date().getFullYear()}`,
-                data: labels.map(() => netWorth += (netMonthlyBalance + totalGrowths)),
+                data: labels.map((label) => {
+                    let assets = []
+                    let liabilities = []
+                    let incomes = []
+                    let fixeds = []
+                    let variables = []
+                    let growths = []
+                    data.assets.forEach((asset)=>{
+                        if (asset.startDate <= label){
+                            assets.push(asset)
+                        }
+                    })
+                    data.liabilities.forEach((liability)=>{
+                        if(liability.startDate <= label){
+                            liabilities.push(liability)
+                        }
+                    })
+                    data.income.forEach((element)=>{
+                        if(element.startDate <= label){
+                            incomes.push(element)
+                        }
+                    })
+                    data.fixed.forEach((element)=>{
+                        if(element.startDate <= label){
+                            fixeds.push(element)
+                        }
+                    })
+                    data.variable.forEach((element)=>{
+                        if(element.startDate <= label){
+                            variables.push(element)
+                        }
+                    })
+                    assets.forEach((asset)=>{
+                        growths.push((asset.value * asset.growthRate/100)/12)
+                    })
+                    let totalNetWorth = assets.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) - liabilities.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
+                    let totalExpenditure = fixeds.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) + variables.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
+                    let netMonthlyBalance = incomes.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) - (totalExpenditure)
+                    let totalGrowths = growths.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+                    console.log(netMonthlyBalance)
+                    console.log(totalExpenditure)
+                    return totalNetWorth += (netMonthlyBalance + totalGrowths) * (labels.indexOf(label) + 1)
+                }),
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             },
