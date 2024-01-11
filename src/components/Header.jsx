@@ -30,7 +30,7 @@ export default function Header() {
             </div>}
             {expandedMenu && <div className="flex flex-col md:block md:py-4">
                 <NavLink to="/capy-finance-client/about" className="text-center py-2 px-5 mx-auto" onClick={() => setExpandedMenu(window.innerWidth < 500 ? false : true)}>About</NavLink>
-                <NavLink to="/capy-finance-client/" className="text-center py-2 px-5 mx-auto" onClick={() => setExpandedMenu(window.innerWidth < 500 ? false : true)}>Contact</NavLink>
+                <NavLink to="/capy-finance-client/contact" className="text-center py-2 px-5 mx-auto" onClick={() => setExpandedMenu(window.innerWidth < 500 ? false : true)}>Contact</NavLink>
             </div>}
             {expandedMenu && <div className="flex flex-col md:block md:py-4">
                 {!user && <NavLink to="/capy-finance-client/users/login" className="text-center py-2 md:py-4 px-5" onClick={() => setExpandedMenu(window.innerWidth < 500 ? false : true)}>Login</NavLink>}
