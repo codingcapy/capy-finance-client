@@ -1,8 +1,5 @@
-# React + Vite
+# CapyFinance Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the client side of CapyFinance, a web app that allows users to subscribe, login and create financial plans by inputting their financial data. The web app calculates net income, net savings, net worth and generates a net growth chart for the user.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Currently live  at: https://codingcapy.github.io/capy-finance-client/
