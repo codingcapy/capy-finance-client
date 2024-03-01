@@ -195,7 +195,7 @@ export default function PlanPage() {
                     })
                     let totalNetWorth = assets.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) - liabilities.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
                     let totalExpenditure = fixeds.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) + variables.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0)
-                    let netMonthlyBalance = incomes.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) - (totalExpenditure)
+                    let netMonthlyBalance = incomes.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) / 12 - (totalExpenditure)
                     let totalGrowths = growths.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
                     console.log(netMonthlyBalance)
                     console.log(totalExpenditure)
